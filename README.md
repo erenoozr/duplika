@@ -1,43 +1,43 @@
 # Duplika
 
-Klasördeki birebir aynı dosyaları içerik (SHA-256) ile bulur. Varsayılan olarak **yalnızca rapor verir**;
-`--tasi` ile kopyaları silmek yerine bir karantina klasörüne taşır. Hiçbir dosyayı silmez.
+Finds byte-identical files in a folder by content (SHA-256). By default it **only reports**;
+with `--move` it moves duplicates to a quarantine folder instead of deleting them. It never deletes anything.
 
-## Kullanım
+## Usage
 
-Python 3.8+ yeterli, ek paket gerekmez.
+Python 3.8+, no dependencies.
 
 ```
-python duplika.py C:\Users\ben\Masaüstü
-python duplika.py C:\Users\ben\Masaüstü --tasi C:\karantina
-python duplika.py D:\Fotoğraflar --min-boyut 100000 --tasi D:\karantina
+python duplika.py C:\Users\me\Desktop
+python duplika.py C:\Users\me\Desktop --move C:\quarantine
+python duplika.py D:\Photos --min-size 100000 --move D:\quarantine
 ```
 
-| Seçenek | Açıklama |
+| Option | Description |
 |---|---|
-| `--tasi KLASOR` | Kopyaları bu klasöre, göreli yollarını koruyarak taşır. Verilmezse yalnızca rapor. |
-| `--min-boyut N` | N bayttan küçük dosyaları atlar (varsayılan 1, yani boş dosyalar atlanır). |
-| `--hepsi` | `.git`, `.venv`, `node_modules` gibi klasörleri de tarar (varsayılan: atlanır). |
-| `--bulut-dahil` | OneDrive'da yalnızca bulutta duran dosyaları da tarar; bu dosyaları indirir. |
+| `--move FOLDER` | Moves duplicates into this folder, preserving their relative paths. Report only if omitted. |
+| `--min-size N` | Skips files smaller than N bytes (default 1, so empty files are skipped). |
+| `--all` | Also scans folders like `.git`, `.venv`, `node_modules` (skipped by default). |
+| `--include-cloud` | Also scans OneDrive online-only files; this downloads them. |
 
-## Nasıl karar verir?
+## How it decides
 
-- Önce boyuta göre eler, yalnızca aynı boyuttaki dosyaları hashler.
-- Her grupta **en eski** dosya saklanır (eşitse en kısa yol).
-- Karantina klasörü taranan klasörün içindeyse taramaya katılmaz; tekrar çalıştırmak güvenlidir.
-- Karantinada aynı adlı dosya varsa üzerine yazmaz, `ad (2).uzantı` olarak taşır.
-- Sanal ortamlar ve sürüm kontrol klasörleri varsayılan olarak atlanır, çünkü içlerindeki "kopyaları" taşımak onları bozar.
+- Filters by size first, then hashes only files that share a size.
+- In each group the **oldest** file is kept (on a tie, the shortest path).
+- If the quarantine folder is inside the scanned folder, it is excluded from the scan, so re-running is safe.
+- If a file with the same name already exists in quarantine, it is not overwritten; the file is moved as `name (2).ext`.
+- Virtual environments and version-control folders are skipped by default, because moving "duplicates" out of them breaks them.
 
-## Sınırlar
+## Limits
 
-- Yalnızca birebir aynı dosyaları bulur; benzer fotoğrafları veya farklı kodlanmış aynı şarkıyı bulmaz.
-- Sembolik bağlantılar atlanır.
+- Only finds exact duplicates, not similar photos or the same song encoded differently.
+- Symbolic links are skipped.
 
-## Geliştirme
+## Development
 
 ```
 pip install pytest
 python -m pytest tests
 ```
 
-Lisans: MIT
+License: MIT
