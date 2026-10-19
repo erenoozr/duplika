@@ -70,9 +70,9 @@ def find_duplicates(root, min_size=1, exclude=None, include_cloud=False, include
 
 def _free_name(target):
     """If the target exists, finds a free name like 'name (2).ext'."""
-    n = 2
+    base, n = target, 2
     while target.exists():
-        target = target.with_name(f"{target.stem.rsplit(' (', 1)[0]} ({n}){target.suffix}")
+        target = base.with_name(f"{base.stem} ({n}){base.suffix}")  # always from the original name: "a (copy).txt" keeps "(copy)"
         n += 1
     return target
 

@@ -58,3 +58,10 @@ def test_env_folders_skipped(tmp_path):
     (tmp_path / "lib.py").write_text("same")
     assert duplika.find_duplicates(tmp_path) == []
     assert len(duplika.find_duplicates(tmp_path, include_all=True)[0][1]) == 4
+
+
+def test_free_name_keeps_parentheses(tmp_path):
+    (tmp_path / "photo (copy).jpg").touch()
+    assert duplika._free_name(tmp_path / "photo (copy).jpg").name == "photo (copy) (2).jpg"
+    (tmp_path / "photo (copy) (2).jpg").touch()
+    assert duplika._free_name(tmp_path / "photo (copy).jpg").name == "photo (copy) (3).jpg"
